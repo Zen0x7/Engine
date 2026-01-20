@@ -39,4 +39,11 @@ jobs:
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
           make -j4
-          ctest
+          ctest  --output-on-failure --verbose
+          cd ..
+          gcovr --filter='src/' --print-summary --sort-percentage --gcov-ignore-parse-errors=negative_hits.warn
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
