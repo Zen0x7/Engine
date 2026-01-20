@@ -13,5 +13,30 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-cmake-build-*
-.idea
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/strateworks/compiler:1.90.0-debug-shared
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run build and test
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
+          make -j4
+          ctest
