@@ -37,5 +37,6 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Debug
+          cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
           make -j4
+          ctest
