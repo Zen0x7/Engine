@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#include <gtest/gtest.h>
+#include <engine/server.hpp>
 
-#include <engine/version.hpp>
+namespace engine {
+    server::server(const std::shared_ptr<state> & state) : state_(state) { }
 
-using namespace engine;
-
-TEST(version_test, it_match_with_current) {
-    ASSERT_EQ(get_version(), "1.0.0");
+    std::shared_ptr<state> server::get_state() const {
+        return state_;
+    }
 }

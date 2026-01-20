@@ -15,10 +15,12 @@
 
 #include <gtest/gtest.h>
 
-#include <engine/version.hpp>
+#include <engine/state.hpp>
 
 using namespace engine;
 
-TEST(version_test, it_match_with_current) {
-    ASSERT_EQ(get_version(), "1.0.0");
+TEST(state_test, it_can_be_instanced) {
+  const auto _a = std::make_shared<state>();
+  const auto _b = std::make_shared<state>();
+  EXPECT_NE(_a->get_id(), _b->get_id());
 }

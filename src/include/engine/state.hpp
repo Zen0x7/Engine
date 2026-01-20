@@ -13,12 +13,34 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#include <gtest/gtest.h>
+#ifndef ENGINE_STATE_HPP
+#define ENGINE_STATE_HPP
 
-#include <engine/version.hpp>
+#include <memory>
+#include <boost/uuid/uuid.hpp>
 
-using namespace engine;
+namespace engine {
+    /**
+     * State
+     */
+    class state : public std::enable_shared_from_this<state> {
+        /**
+         * ID
+         */
+        boost::uuids::uuid id_;
+    public:
+        /**
+         * Constructor
+         */
+        state();
 
-TEST(version_test, it_match_with_current) {
-    ASSERT_EQ(get_version(), "1.0.0");
+        /**
+         * Get ID
+         *
+         * @return
+         */
+        boost::uuids::uuid get_id() const;
+    };
 }
+
+#endif // ENGINE_STATE_HPP

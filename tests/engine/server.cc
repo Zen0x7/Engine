@@ -15,10 +15,15 @@
 
 #include <gtest/gtest.h>
 
-#include <engine/version.hpp>
+#include <engine/server.hpp>
+#include <engine/state.hpp>
 
 using namespace engine;
 
-TEST(version_test, it_match_with_current) {
-    ASSERT_EQ(get_version(), "1.0.0");
+TEST(server_test, it_can_be_instanced) {
+    const auto _state = std::make_shared<state>();
+    const auto _a = std::make_shared<server>(_state);
+    const auto _b = std::make_shared<server>(_state);
+    ASSERT_EQ(_a->get_state()->get_id(), _state->get_id());
+    ASSERT_EQ(_a->get_state()->get_id(), _b->get_state()->get_id());
 }
