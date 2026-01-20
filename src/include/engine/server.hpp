@@ -13,12 +13,40 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#include <gtest/gtest.h>
+#ifndef ENGINE_SERVER_HPP
+#define ENGINE_SERVER_HPP
 
-#include <engine/version.hpp>
+#include <memory>
 
-using namespace engine;
+namespace engine {
+    /**
+     * Forward State
+     */
+    class state;
 
-TEST(version_test, it_match_with_current) {
-    ASSERT_EQ(get_version(), "1.0.0");
+    /**
+     * Server
+     */
+    class server : public std::enable_shared_from_this<server> {
+        /**
+         * State
+         */
+        std::shared_ptr<state> state_;
+      public:
+        /**
+         * Constructor
+
+         * @param state
+         */
+        explicit server(const std::shared_ptr<state> & state);
+
+        /**
+         * Get State
+         *
+         * @return
+         */
+        std::shared_ptr<state> get_state() const;
+    };
 }
+
+#endif // ENGINE_SERVER_HPP

@@ -14,8 +14,15 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <engine/state.hpp>
+#include <engine/server.hpp>
 
 int main() {
+    using namespace engine;
+
+    auto _state = std::make_shared<state>();
+    auto _server = std::make_shared<server>(_state);
+
     std::cout << "Hello, World!" << std::endl;
     return 0;
 }

@@ -13,12 +13,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#include <gtest/gtest.h>
+#include <engine/state.hpp>
 
-#include <engine/version.hpp>
+#include <boost/uuid/random_generator.hpp>
 
-using namespace engine;
+namespace engine {
+    state::state() : id_(boost::uuids::random_generator()()) { }
 
-TEST(version_test, it_match_with_current) {
-    ASSERT_EQ(get_version(), "1.0.0");
+    boost::uuids::uuid state::get_id() const {
+        return id_;
+    }
 }
