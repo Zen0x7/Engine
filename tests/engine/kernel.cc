@@ -29,6 +29,9 @@ using namespace engine;
 TEST(kernel_test, it_can_be_instanced) {
   const auto _state = std::make_shared<state>();
   const auto _kernel = std::make_shared<kernel>(_state);
+
+  ASSERT_NE(_state->get_id(), _kernel->get_id());
+  ASSERT_EQ(_state->get_id(), _kernel->get_state()->get_id());
 }
 
 TEST(kernel_test, it_can_handle_requests) {
