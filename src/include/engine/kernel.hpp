@@ -64,21 +64,21 @@ namespace engine {
          * @param request
          * @return
          */
-        response handle(const request & request);
+        response handle(const request & request) const;
 
         /**
          * Get ID
          *
          * @return
          */
-        boost::uuids::uuid get_id() const;
+        [[nodiscard]] boost::uuids::uuid get_id() const;
 
         /**
          * Get State
          *
          * @return
          */
-        std::shared_ptr<state> get_state() const;
+        [[nodiscard]] std::shared_ptr<state> get_state() const;
     };
 }
 

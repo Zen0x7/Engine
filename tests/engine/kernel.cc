@@ -38,15 +38,16 @@ TEST(kernel_test, it_can_handle_requests) {
   const auto _state = std::make_shared<state>();
   const auto _kernel = std::make_shared<kernel>(_state);
 
-  constexpr request _request;
+  const request _request;
   const auto _response = _kernel->handle(_request);
   ASSERT_TRUE(_response.get_resolved());
+  ASSERT_GT(_response.get_resolved_at(), 0);
 }
 
 TEST(kernel_test, it_can_be_benchmarked) {
   const auto _state = std::make_shared<state>();
   const auto _kernel = std::make_shared<kernel>(_state);
-  constexpr request _request;
+  const request _request;
 
 
   const auto _start_at = std::chrono::high_resolution_clock::now().time_since_epoch().count();

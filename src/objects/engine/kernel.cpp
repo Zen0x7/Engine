@@ -18,13 +18,24 @@
 #include <engine/response.hpp>
 
 #include <boost/uuid/random_generator.hpp>
+#include <engine/request.hpp>
+
+#include <engine/state.hpp>
 
 namespace engine {
     kernel::kernel(const std::shared_ptr<state> &state) : id_(boost::uuids::random_generator()()), state_(state) {
     }
 
-    response kernel::handle(const request &request) {
+    response kernel::handle(const request &request) const {
         response _response;
+
+        const auto _actions = state_->get_actions();
+
+        if (const auto _exists = _actions.contains(request.get_action()); _exists) {
+            auto & _action = _actions.at(request.get_action());
+            _action(request, _response, state_);
+            _response.mark_as_handled();
+        }
 
         _response.mark_as_resolved();
 

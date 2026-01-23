@@ -16,6 +16,8 @@
 #ifndef ENGINE_RESPONSE_HPP
 #define ENGINE_RESPONSE_HPP
 
+#include <cstdint>
+
 namespace engine {
     /**
      * Response
@@ -25,6 +27,26 @@ namespace engine {
          * Resolved
          */
         bool resolved_ = false;
+
+        /**
+         * Resolved At
+         */
+        std::uint64_t resolved_at_ = 0;
+
+        /**
+         * Handled
+         */
+        bool handled_ = false;
+
+        /**
+         * Handled At
+         */
+        std::uint64_t handled_at_ = 0;
+
+        /**
+         * Status
+         */
+        int status_ = 0;
     public:
         /**
          * Mark As Resolved
@@ -32,11 +54,51 @@ namespace engine {
         void mark_as_resolved();
 
         /**
+         * Mark As Handled
+         */
+        void mark_as_handled();
+
+        /**
          * Get Resolved
          *
          * @return
          */
         bool get_resolved() const;
+
+        /**
+         * Get Resolved At
+         *
+         * @return
+         */
+        std::uint64_t get_resolved_at() const;
+
+        /**
+         * Get Handled
+         *
+         * @return
+         */
+        bool get_handled() const;
+
+        /**
+         * Get Handled At
+         *
+         * @return
+         */
+        std::uint64_t get_handled_at() const;
+
+        /**
+         * Get Status
+         *
+         * @return
+         */
+        int get_status() const;
+
+        /**
+         * Set Status
+         *
+         * @param status
+         */
+        void set_status(int status);
     };
 }
 

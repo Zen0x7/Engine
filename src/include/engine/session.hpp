@@ -13,13 +13,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#include <engine/request.hpp>
+#ifndef ENGINE_SESSION_HPP
+#define ENGINE_SESSION_HPP
+
+#include <engine/kernel.hpp>
+
+#include <memory>
 
 namespace engine {
-    request::request(const action action) : action_(action) {
-    }
+    /**
+     * Session
+     */
+    class session : public std::enable_shared_from_this<session> {
+        std::shared_ptr<state> state_;
+        std::unique_ptr<kernel> kernel_;
 
-    action request::get_action() const {
-        return action_;
-    }
+    public:
+
+        session(const std::shared_ptr<state> &state);
+
+        response on_request(const request & request) const;
+    };
 }
+
+#endif // ENGINE_SESSION_HPP

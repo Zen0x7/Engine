@@ -16,11 +16,30 @@
 #ifndef ENGINE_REQUEST_HPP
 #define ENGINE_REQUEST_HPP
 
+#include <algorithm>
+#include <engine/action.hpp>
+
 namespace engine {
+
     /**
      * Request
      */
     class request {
+        /**
+         * Action
+         */
+        action action_ = UNDEFINED;
+
+    public:
+        request(action action = UNDEFINED);
+
+
+        /**
+         * Get Action
+         *
+         * @return
+         */
+        action get_action() const;
     };
 }
 

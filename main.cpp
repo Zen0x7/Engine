@@ -23,6 +23,5 @@ int main() {
     auto _state = std::make_shared<state>();
     auto _server = std::make_shared<server>(_state);
 
-    std::cout << "Hello, World!" << std::endl;
     return 0;
 }

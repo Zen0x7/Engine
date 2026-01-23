@@ -13,13 +13,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#include <engine/request.hpp>
+#ifndef ENGINE_CALLBACK_HPP
+#define ENGINE_CALLBACK_HPP
+
+#include <functional>
+#include <memory>
 
 namespace engine {
-    request::request(const action action) : action_(action) {
-    }
+    /**
+     * Forward Request
+     */
+    class request;
 
-    action request::get_action() const {
-        return action_;
-    }
+    /**
+     * Forward Response
+     */
+    class response;
+
+    /**
+     * Forward State
+     */
+    class state;
+
+    /**
+     * Callback
+     */
+    using callback = std::function<void(const request &, response &, const std::shared_ptr<state> &)>;
 }
+
+#endif // ENGINE_CALLBACK_HPP

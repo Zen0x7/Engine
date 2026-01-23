@@ -13,13 +13,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#include <engine/request.hpp>
+#ifndef ENGINE_ACTION_HPP
+#define ENGINE_ACTION_HPP
 
 namespace engine {
-    request::request(const action action) : action_(action) {
-    }
-
-    action request::get_action() const {
-        return action_;
-    }
+    /**
+     * Action
+     */
+    enum action {
+        UNDEFINED = 0,
+        PING = 1,
+    };
 }
+
+#endif // ENGINE_ACTION_HPP
