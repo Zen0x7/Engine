@@ -23,4 +23,12 @@ namespace engine {
     boost::uuids::uuid state::get_id() const {
         return id_;
     }
+
+    const std::unordered_map<action, callback> & state::get_actions() const {
+        return actions_;
+    }
+
+    void state::push_action(const action action, callback callback) {
+        actions_[action] = std::move(callback);
+    }
 }

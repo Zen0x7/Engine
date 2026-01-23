@@ -14,13 +14,40 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include <engine/response.hpp>
+#include <chrono>
 
 namespace engine {
     void response::mark_as_resolved() {
         resolved_ = true;
+        resolved_at_ = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    }
+
+    void response::mark_as_handled() {
+        handled_ = true;
+        handled_at_ = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     }
 
     bool response::get_resolved() const {
         return resolved_;
+    }
+
+    std::uint64_t response::get_resolved_at() const {
+        return resolved_at_;
+    }
+
+    bool response::get_handled() const {
+        return handled_;
+    }
+
+    std::uint64_t response::get_handled_at() const {
+        return handled_at_;
+    }
+
+    int response::get_status() const {
+        return status_;
+    }
+
+    void response::set_status(const int status) {
+        status_ = status;
     }
 }

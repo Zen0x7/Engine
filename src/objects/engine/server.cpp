@@ -14,9 +14,11 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include <engine/server.hpp>
+#include <engine/state.hpp>
 
 namespace engine {
-    server::server(const std::shared_ptr<state> & state) : state_(state) { }
+    server::server(const std::shared_ptr<state> & state) : state_(state) {
+    }
 
     std::shared_ptr<state> server::get_state() const {
         return state_;

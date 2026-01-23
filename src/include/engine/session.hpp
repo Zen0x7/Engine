@@ -13,41 +13,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef ENGINE_KERNEL_HPP
-#define ENGINE_KERNEL_HPP
+#ifndef ENGINE_SESSION_HPP
+#define ENGINE_SESSION_HPP
+
+#include <engine/kernel.hpp>
 
 #include <memory>
-#include <boost/uuid/uuid.hpp>
 
 namespace engine {
     /**
-     * Forward State
+     * Session
      */
-    class state;
-
-    /**
-     * Forward Request
-     */
-    class request;
-
-    /**
-     * Forward Response
-     */
-    class response;
-
-    /**
-     * Kernel
-     */
-    class kernel {
-        /**
-         * ID
-         */
-        boost::uuids::uuid id_;
-
+    class session : public std::enable_shared_from_this<session> {
         /**
          * State
          */
         std::shared_ptr<state> state_;
+
+        /**
+         * Kernel
+         */
+        std::unique_ptr<kernel> kernel_;
 
     public:
         /**
@@ -55,31 +41,16 @@ namespace engine {
          *
          * @param state
          */
-        explicit kernel(const std::shared_ptr<state> &state);
-
+        explicit session(const std::shared_ptr<state> &state);
 
         /**
-         * Handle
+         * On Request
          *
          * @param request
          * @return
          */
-        response handle(const request & request) const;
-
-        /**
-         * Get ID
-         *
-         * @return
-         */
-        [[nodiscard]] boost::uuids::uuid get_id() const;
-
-        /**
-         * Get State
-         *
-         * @return
-         */
-        [[nodiscard]] std::shared_ptr<state> get_state() const;
+        response on_request(const request & request) const;
     };
 }
 
-#endif // ENGINE_KERNEL_HPP
+#endif // ENGINE_SESSION_HPP

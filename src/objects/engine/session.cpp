@@ -13,13 +13,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#include <engine/request.hpp>
+#include <engine/session.hpp>
+
+#include <engine/kernel.hpp>
+#include <engine/response.hpp>
 
 namespace engine {
-    request::request(const action action) : action_(action) {
+    session::session(const std::shared_ptr<state> &state) :
+        state_(state),
+        kernel_(std::make_unique<kernel>(state)) {
     }
 
-    action request::get_action() const {
-        return action_;
+    response session::on_request(const request &request) const {
+        return kernel_->handle(request);
     }
 }

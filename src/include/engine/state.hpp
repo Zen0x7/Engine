@@ -16,8 +16,12 @@
 #ifndef ENGINE_STATE_HPP
 #define ENGINE_STATE_HPP
 
+#include <engine/action.hpp>
+#include <engine/callback.hpp>
+
 #include <memory>
 #include <boost/uuid/uuid.hpp>
+#include <unordered_map>
 
 namespace engine {
     /**
@@ -28,6 +32,11 @@ namespace engine {
          * ID
          */
         boost::uuids::uuid id_;
+
+        /**
+         * Callbacks
+         */
+        std::unordered_map<action, callback> actions_;
     public:
         /**
          * Constructor
@@ -40,6 +49,21 @@ namespace engine {
          * @return
          */
         boost::uuids::uuid get_id() const;
+
+        /**
+         * Get Actions
+         *
+         * @return
+         */
+        const std::unordered_map<action, callback> &get_actions() const;
+
+        /**
+         * Push Action
+         *
+         * @param action
+         * @param callback
+         */
+        void push_action(action action, callback callback);
     };
 }
 

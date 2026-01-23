@@ -13,13 +13,32 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+#include <gtest/gtest.h>
+
+#include <engine/kernel.hpp>
+
+#include <engine/state.hpp>
+
 #include <engine/request.hpp>
+#include <engine/response.hpp>
+#include <engine/session.hpp>
 
-namespace engine {
-    request::request(const action action) : action_(action) {
-    }
+#include <iostream>
 
-    action request::get_action() const {
-        return action_;
-    }
+using namespace engine;
+
+TEST(session_test, it_can_handle_requests) {
+    const auto _state = std::make_shared<state>();
+
+    _state->push_action(PING, [](const request &request, response &response, std::shared_ptr<state> state) {
+        response.set_status(200);
+    });
+
+    const auto _session = std::make_shared<session>(_state);
+
+    const request _request(PING);
+    const auto _response = _session->on_request(_request);
+
+    ASSERT_EQ(_response.get_status(), 200);
+    ASSERT_NE(_response.get_status(), 0);
 }
