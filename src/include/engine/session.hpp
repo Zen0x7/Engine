@@ -25,13 +25,30 @@ namespace engine {
      * Session
      */
     class session : public std::enable_shared_from_this<session> {
+        /**
+         * State
+         */
         std::shared_ptr<state> state_;
+
+        /**
+         * Kernel
+         */
         std::unique_ptr<kernel> kernel_;
 
     public:
+        /**
+         * Constructor
+         *
+         * @param state
+         */
+        explicit session(const std::shared_ptr<state> &state);
 
-        session(const std::shared_ptr<state> &state);
-
+        /**
+         * On Request
+         *
+         * @param request
+         * @return
+         */
         response on_request(const request & request) const;
     };
 }

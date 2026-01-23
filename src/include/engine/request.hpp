@@ -31,7 +31,12 @@ namespace engine {
         action action_ = UNDEFINED;
 
     public:
-        request(action action = UNDEFINED);
+        /**
+         * Constructor
+         *
+         * @param action
+         */
+        explicit request(action action = UNDEFINED);
 
 
         /**
