@@ -41,4 +41,6 @@ TEST(session_test, it_can_handle_requests) {
 
     ASSERT_EQ(_response.get_status(), 200);
     ASSERT_NE(_response.get_status(), 0);
+    ASSERT_TRUE(_response.get_handled());
+    ASSERT_GT(_response.get_handled_at(), 0);
 }
