@@ -21,16 +21,39 @@
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core/bind_handler.hpp>
 
+#include <iostream>
+
 namespace engine {
     listener::listener(boost::asio::io_context &io_context, const boost::asio::ip::tcp::endpoint &endpoint, const std::shared_ptr<state> &state) :
         io_context_(io_context),
         acceptor_(make_strand(io_context)), state_(state) {
         boost::system::error_code _error_code;
+
         acceptor_.open(endpoint.protocol(), _error_code);
+        if (_error_code) {
+            std::cout << "Error on port opening: " << _error_code.message() << std::endl;
+        }
+
         acceptor_.set_option(boost::asio::ip::tcp::no_delay(true), _error_code);
+        if (_error_code) {
+            std::cout << "Error on nagle disable: " << _error_code.message() << std::endl;
+        }
+        
         acceptor_.set_option(boost::asio::socket_base::reuse_address(true), _error_code);
+        if (_error_code) {
+            std::cout << "Error on reuse address: " << _error_code.message() << std::endl;
+        }
+        
         acceptor_.bind(endpoint, _error_code);
+        if (_error_code) {
+            std::cout << "Error on endpoint bind: " << _error_code.message() << std::endl;
+        }
+        
         acceptor_.listen(boost::asio::socket_base::max_listen_connections, _error_code);
+        if (_error_code) {
+            std::cout << "Error on listen: " << _error_code.message() << std::endl;
+        }
+        
         state_->set_port(acceptor_.local_endpoint().port());
     }
 
