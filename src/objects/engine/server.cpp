@@ -41,7 +41,7 @@ namespace engine {
 
         std::vector<std::jthread> _threads;
         _threads.reserve(number_of_threads - 1);
-        for (int i = 0; i < number_of_threads - 1; i++) {
+        for (int _i = 0; _i < number_of_threads - 1; _i++) {
             _threads.emplace_back([this]() {
                 io_context_.run();
             });
