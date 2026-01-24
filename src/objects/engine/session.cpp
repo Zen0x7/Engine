@@ -57,10 +57,12 @@ namespace engine {
     }
 
     void session::send(std::shared_ptr<std::vector<std::byte> const> const &data) {
-        boost::asio::post(socket_.get_executor(), boost::beast::bind_front_handler(
-                              &session::on_send,
-                              shared_from_this(),
-                              data));
+        post(
+            socket_.get_executor(),
+            boost::beast::bind_front_handler(
+                &session::on_send,
+                shared_from_this(),
+                data));
     }
 
     void session::read_header() {
@@ -73,8 +75,6 @@ namespace engine {
     }
 
     void session::read_payload(const std::uint32_t pending_bytes) {
-        auto _self = shared_from_this();
-
         auto &_buffer = get_buffer();
 
         async_read(
@@ -85,8 +85,6 @@ namespace engine {
     }
 
     void session::handle_payload(const std::size_t offset, const std::size_t bytes) {
-        auto _self = shared_from_this();
-
         auto &_buffer = buffers_[offset];
 
         const std::span _bytes(_buffer.storage_.data(), bytes);

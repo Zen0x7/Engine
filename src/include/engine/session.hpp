@@ -72,7 +72,7 @@ namespace engine {
         /**
          * Current Header
          */
-        std::array<std::byte, ENGINE_SESSION_HEADER_LENGTH> header_;
+        std::array<std::byte, ENGINE_SESSION_HEADER_LENGTH> header_ {};
 
         /**
          * Queue
