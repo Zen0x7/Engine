@@ -57,12 +57,12 @@ namespace engine {
         /**
          * Buffers
          */
-        std::vector<buffer> buffers_;
+        std::array<buffer, ENGINE_SESSION_BUFFERS_LENGTH> buffers_;
 
         /**
          * Current Header
          */
-        std::vector<std::byte> header_;
+        std::array<std::byte, 4> header_;
     public:
         /**
          * Constructor
