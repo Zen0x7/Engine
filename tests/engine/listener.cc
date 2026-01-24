@@ -13,38 +13,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef ENGINE_REQUEST_HPP
-#define ENGINE_REQUEST_HPP
+#include "listener_test.hpp"
 
-#include <algorithm>
-#include <engine/action.hpp>
 
-namespace engine {
-
-    /**
-     * Request
-     */
-    class request {
-        /**
-         * Action
-         */
-        action action_ = UNDEFINED;
-
-    public:
-        /**
-         * Constructor
-         *
-         * @param action
-         */
-        explicit request(action action = UNDEFINED);
-
-        /**
-         * Get Action
-         *
-         * @return
-         */
-        [[nodiscard]] action get_action() const;
-    };
+TEST_F(listener_test, it_can_open_a_local_port) {
+    ASSERT_NE(server_->get_state()->get_port(), 0);
 }
-
-#endif // ENGINE_REQUEST_HPP

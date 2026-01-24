@@ -22,15 +22,21 @@ option(BUILD_TESTS "Build test cases" ON)
 add_executable(server main.cpp)
 
 find_package(Boost REQUIRED)
-include_directories(src/include)
 
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g --coverage -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS_DEBUG
+        "-O0 -g -fsanitize=address -fno-omit-frame-pointer"
+)
+set(CMAKE_LINKER_FLAGS_DEBUG
+        "-fsanitize=address"
+)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/objects/*.cpp")
 
-add_library(core ${SOURCES})
+add_library(core OBJECT ${SOURCES})
+target_include_directories(core PUBLIC src/include)
 target_link_libraries(core ${Boost_LIBRARIES})
-target_link_libraries(server core)
+target_link_libraries(server $<TARGET_OBJECTS:core>)
+target_include_directories(server PRIVATE src/include)
 
 if (BUILD_TESTS)
     include(FetchContent)
@@ -43,7 +49,8 @@ if (BUILD_TESTS)
     file(GLOB_RECURSE TESTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cc")
     add_executable(tests ${TESTS})
 
-    target_link_libraries(tests GTest::gtest_main core)
+    target_link_libraries(tests GTest::gtest_main $<TARGET_OBJECTS:core>)
+    target_include_directories(tests PRIVATE src/include)
     include(GoogleTest)
     gtest_discover_tests(tests)
 endif ()

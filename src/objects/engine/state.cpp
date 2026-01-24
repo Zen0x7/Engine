@@ -31,4 +31,12 @@ namespace engine {
     void state::push_action(const action action, callback callback) {
         actions_[action] = std::move(callback);
     }
+
+    void state::set_port(const unsigned short port) {
+        port_.store(port, std::memory_order_release);
+    }
+
+    unsigned short state::get_port() const {
+        return port_.load(std::memory_order_acquire);
+    }
 }
