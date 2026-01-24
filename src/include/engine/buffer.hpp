@@ -23,8 +23,18 @@
 #include <array>
 
 namespace engine {
+    /**
+     * Buffer
+     */
     struct buffer {
+        /**
+         * Storage
+         */
         std::array<std::byte, ENGINE_BUFFER_SIZE> storage_{};
+
+        /**
+         * Used
+         */
         bool used_ = false;
     };
 }
