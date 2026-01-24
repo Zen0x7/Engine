@@ -23,12 +23,7 @@ add_executable(server main.cpp)
 
 find_package(Boost REQUIRED)
 
-set(CMAKE_CXX_FLAGS_DEBUG
-        "-O0 -g -fsanitize=address -fno-omit-frame-pointer"
-)
-set(CMAKE_LINKER_FLAGS_DEBUG
-        "-fsanitize=address"
-)
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g --coverage -fprofile-arcs -ftest-coverage")
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/objects/*.cpp")
 

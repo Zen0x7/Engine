@@ -23,15 +23,25 @@
 
 class listener_test : public testing::Test {
 protected:
+    /**
+     * Thread
+     */
     std::unique_ptr<std::jthread> thread_;
-    std::shared_ptr<engine::state> state_;
-    std::shared_ptr<engine::server> server_;
 
+    /**
+     * State
+     */
+    std::shared_ptr<engine::state> state_ = std::make_shared<engine::state>();
+
+    /**
+     * Server
+     */
+    std::shared_ptr<engine::server> server_ = std::make_shared<engine::server>(state_);
+
+    /**
+     * Set Up
+     */
     void SetUp() override {
-        state_ = std::make_shared<engine::state>();
-        server_ = std::make_shared<engine::server>(state_);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         thread_ = std::make_unique<std::jthread>([this]() {
             server_->start();
         });
@@ -41,6 +51,9 @@ protected:
         }
     }
 
+    /**
+     * Tears Down
+     */
     void TearDown() override {
         server_->stop();
         thread_->join();
