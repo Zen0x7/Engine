@@ -28,8 +28,6 @@ namespace engine {
     }
 
     void server::start(const int number_of_threads) {
-        static_assert(number_of_threads > 0, "Number of threads must be greater than 0");
-
         auto _endpoint =  boost::asio::ip::tcp::endpoint{
             boost::asio::ip::make_address(
                 "0.0.0.0"),
