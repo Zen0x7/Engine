@@ -70,7 +70,8 @@ namespace engine {
 
     void listener::on_accept(const boost::system::error_code &error_code, boost::asio::ip::tcp::socket socket) {
         if (!error_code) {
-            auto _session = std::make_shared<session>(state_, std::move(socket));
+            const auto _session = std::make_shared<session>(state_, std::move(socket));
+            state_->add_session(_session);
             _session->start();
         }
         do_accept();

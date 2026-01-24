@@ -14,22 +14,34 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include <iostream>
+#include <queue>
 #include <engine/session.hpp>
 
 #include <engine/kernel.hpp>
 #include <engine/response.hpp>
 
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
 #include <boost/endian/conversion.hpp>
 
 #include <boost/core/ignore_unused.hpp>
 
 #include <boost/algorithm/hex.hpp>
+#include <boost/beast/core/bind_handler.hpp>
+#include <engine/state.hpp>
 
 namespace engine {
-    session::session(const std::shared_ptr<state> &state, boost::asio::ip::tcp::socket socket) : state_(state),
-        kernel_(std::make_unique<kernel>(state)),
-        socket_(std::move(socket)) {
+    session::session(const std::shared_ptr<state> &state,
+                     boost::asio::ip::tcp::socket socket) : id_(boost::uuids::random_generator()()),
+                                                            state_(state),
+                                                            kernel_(std::make_unique<kernel>(state)),
+                                                            socket_(std::move(socket)) {
+    }
+
+    session::~session() {
+        std::cout << "[" << to_string(id_) << "] session released" << std::endl;
     }
 
     response session::on_request(const request &request) const {
@@ -40,54 +52,39 @@ namespace engine {
         read_header();
     }
 
-    void session::read_header() {
-        auto _self = shared_from_this();
+    boost::uuids::uuid session::get_id() const {
+        return id_;
+    }
 
+    void session::send(std::shared_ptr<std::vector<std::byte> const> const &data) {
+        post(
+            socket_.get_executor(),
+            boost::beast::bind_front_handler(
+                &session::on_send,
+                shared_from_this(),
+                data));
+    }
+
+    void session::read_header() {
         async_read(
             socket_,
             boost::asio::buffer(header_.data(), ENGINE_SESSION_HEADER_LENGTH),
             boost::asio::transfer_exactly(ENGINE_SESSION_HEADER_LENGTH),
-            [_self](const boost::system::error_code &error_code, std::size_t bytes_transferred) {
-                boost::ignore_unused(bytes_transferred);
-
-                if (error_code) {
-                    return;
-                }
-
-                const auto _data = static_cast<unsigned char const *>(
-                    static_cast<void const *>(
-                        _self->header_.data()
-                    )
-                );
-
-                const std::uint32_t _value = boost::endian::load_big_u32(_data);
-                _self->read_payload(_value);
-            });
+            boost::beast::bind_front_handler(&session::on_header, shared_from_this())
+        );
     }
 
     void session::read_payload(const std::uint32_t pending_bytes) {
-        auto _self = shared_from_this();
-
         auto &_buffer = get_buffer();
 
         async_read(
             socket_,
             boost::asio::buffer(_buffer.storage_.data(), pending_bytes),
             boost::asio::transfer_exactly(pending_bytes),
-            [_self](const boost::system::error_code &error_code, std::size_t bytes_transferred) {
-                if (error_code) {
-                    return;
-                }
-
-                _self->on_payload(_self->buffer_offset_, bytes_transferred);
-                _self->buffer_offset_++;
-                _self->read_header();
-            });
+            boost::beast::bind_front_handler(&session::on_payload, shared_from_this()));
     }
 
-    void session::on_payload(const std::size_t offset, const std::size_t bytes) {
-        auto _self = shared_from_this();
-
+    void session::handle_payload(const std::size_t offset, const std::size_t bytes) {
         auto &_buffer = buffers_[offset];
 
         const std::span _bytes(_buffer.storage_.data(), bytes);
@@ -101,9 +98,8 @@ namespace engine {
 
         std::cout << _printable << std::endl;
 
-        // post(socket_.get_executor(), [_bytes, _self]() {
-        //     // Handle stream of bytes...
-        // });
+        std::vector _response = {std::byte{0x00}, std::byte{0x01}};
+        send(std::make_shared<std::vector<std::byte> const>(_response));
     }
 
     bool session::buffer_is_last() const {
@@ -116,5 +112,67 @@ namespace engine {
         }
 
         return buffers_[buffer_offset_];
+    }
+
+    void session::on_header(const boost::system::error_code &error_code, std::size_t bytes_transferred) {
+        boost::ignore_unused(bytes_transferred);
+
+        if (error_code) {
+            state_->remove_session(get_id());
+            return;
+        }
+
+        const auto _data = static_cast<unsigned char const *>(
+            static_cast<void const *>(
+                header_.data()
+            )
+        );
+
+        const std::uint32_t _value = boost::endian::load_big_u32(_data);
+        read_payload(_value);
+    }
+
+    void session::on_payload(const boost::system::error_code &error_code, const std::size_t bytes_transferred) {
+        if (error_code) {
+            state_->remove_session(get_id());
+            return;
+        }
+
+        handle_payload(buffer_offset_, bytes_transferred);
+        buffer_offset_++;
+        read_header();
+    }
+
+    void session::on_send(std::shared_ptr<std::vector<std::byte> const> const &data) {
+        queue_.push_back(data);
+
+        if (queue_.size() > 1)
+            return;
+
+        async_write(
+            socket_,
+            boost::asio::buffer(*queue_.front()),
+            boost::beast::bind_front_handler(
+                &session::on_write,
+                shared_from_this()
+            ));
+    }
+
+    void session::on_write(const boost::system::error_code &error_code, std::size_t bytes_transferred) {
+        if (error_code) {
+            return;
+        }
+
+        queue_.erase(queue_.begin());
+
+        if (!queue_.empty()) {
+            async_write(
+                socket_,
+                boost::asio::buffer(*queue_.front()),
+                boost::beast::bind_front_handler(
+                    &session::on_write, shared_from_this()
+                )
+            );
+        }
     }
 }

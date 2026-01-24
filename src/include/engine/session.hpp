@@ -21,6 +21,7 @@
 #include <memory>
 #include <array>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/uuid/uuid.hpp>
 
 #include <engine/buffer.hpp>
 
@@ -38,6 +39,11 @@ namespace engine {
      * Session
      */
     class session : public std::enable_shared_from_this<session> {
+        /**
+         * ID
+         */
+        boost::uuids::uuid id_;
+
         /**
          * State
          */
@@ -66,7 +72,12 @@ namespace engine {
         /**
          * Current Header
          */
-        std::array<std::byte, ENGINE_SESSION_HEADER_LENGTH> header_;
+        std::array<std::byte, ENGINE_SESSION_HEADER_LENGTH> header_ {};
+
+        /**
+         * Queue
+         */
+        std::vector<std::shared_ptr<std::vector<std::byte> const>> queue_;
     public:
         /**
          * Constructor
@@ -75,6 +86,11 @@ namespace engine {
          * @param socket
          */
         explicit session(const std::shared_ptr<state> &state, boost::asio::ip::tcp::socket socket);
+
+        /**
+         * Destructor
+         */
+        ~session();
 
         /**
          * On Request
@@ -88,6 +104,20 @@ namespace engine {
          * Start
          */
         void start();
+
+        /**
+         * Get ID
+         *
+         * @return
+         */
+        boost::uuids::uuid get_id() const;
+
+        /**
+         * Send
+         *
+         * @param data
+         */
+        void send(std::shared_ptr<std::vector<std::byte> const> const &data);
     private:
         /**
          * Read Header
@@ -102,12 +132,12 @@ namespace engine {
         void read_payload(std::uint32_t pending_bytes);
 
         /**
-         * On Payload
+         * Handle Payload
          *
          * @param offset
          * @param bytes
          */
-        void on_payload(std::size_t offset, std::size_t bytes);
+        void handle_payload(std::size_t offset, std::size_t bytes);
 
         /**
          * Buffer Is Last
@@ -122,6 +152,37 @@ namespace engine {
          * @return
          */
         buffer & get_buffer();
+
+        /**
+         * On Header
+         *
+         * @param error_code
+         * @param bytes_transferred
+         */
+        void on_header(const boost::system::error_code & error_code, std::size_t bytes_transferred);
+
+        /**
+         * On Payload
+         *
+         * @param error_code
+         * @param bytes_transferred
+         */
+        void on_payload(const boost::system::error_code & error_code, std::size_t bytes_transferred);
+
+        /**
+         * On Send
+         *
+         * @param data
+         */
+        void on_send(std::shared_ptr<std::vector<std::byte> const> const& data);
+
+        /**
+         * On Write
+         *
+         * @param error_code
+         * @param bytes_transferred
+         */
+        void on_write(const boost::system::error_code &error_code, std::size_t bytes_transferred);
     };
 }
 

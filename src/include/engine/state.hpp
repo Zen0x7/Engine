@@ -23,8 +23,14 @@
 #include <boost/uuid/uuid.hpp>
 #include <unordered_map>
 #include <atomic>
+#include <shared_mutex>
 
 namespace engine {
+    /**
+     * Forward Session
+     */
+    class session;
+
     /**
      * State
      */
@@ -44,6 +50,15 @@ namespace engine {
          */
         std::atomic<unsigned short> port_ = 0;
 
+        /**
+         * Sessions
+         */
+        std::unordered_map<boost::uuids::uuid, std::shared_ptr<session>> sessions_;
+
+        /**
+         * Sessions Mutex
+         */
+        std::shared_mutex sessions_mutex_;
     public:
         /**
          * Constructor
@@ -83,6 +98,27 @@ namespace engine {
          * Get Port
          */
         unsigned short get_port() const;
+
+        /**
+         * Add Session
+         *
+         * @param session
+         */
+        void add_session(const std::shared_ptr<session> &session);
+
+        /**
+         * Remove Session
+         *
+         * @param id
+         */
+        void remove_session(boost::uuids::uuid id);
+
+        /**
+         * Get Sessions
+         *
+         * @return
+         */
+        std::unordered_map<boost::uuids::uuid, std::shared_ptr<session>> &get_sessions();
     };
 }
 
