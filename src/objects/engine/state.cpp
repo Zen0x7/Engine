@@ -16,6 +16,9 @@
 #include <engine/state.hpp>
 
 #include <boost/uuid/random_generator.hpp>
+#include <mutex>
+
+#include <engine/session.hpp>
 
 namespace engine {
     state::state() : id_(boost::uuids::random_generator()()) { }
@@ -38,5 +41,20 @@ namespace engine {
 
     unsigned short state::get_port() const {
         return port_.load(std::memory_order_acquire);
+    }
+
+    void state::add_session(const std::shared_ptr<session> &session) {
+        std::unique_lock _lock(sessions_mutex_);
+        sessions_.emplace(session->get_id(), session);
+    }
+
+    void state::remove_session(const boost::uuids::uuid id) {
+        std::unique_lock _lock(sessions_mutex_);
+        sessions_.erase(id);
+    }
+
+    std::unordered_map<boost::uuids::uuid, std::shared_ptr<session>> & state::get_sessions() {
+        std::shared_lock _lock(sessions_mutex_);
+        return sessions_;
     }
 }

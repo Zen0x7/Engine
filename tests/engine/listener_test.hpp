@@ -43,7 +43,7 @@ protected:
      */
     void SetUp() override {
         thread_ = std::make_unique<std::jthread>([this]() {
-            server_->start();
+            server_->start(4);
         });
 
         while (server_->get_state()->get_port() == 0) {
