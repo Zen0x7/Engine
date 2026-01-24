@@ -13,11 +13,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef ENGINE_SERVER_HPP
-#define ENGINE_SERVER_HPP
+#ifndef ENGINE_LISTENER_HPP
+#define ENGINE_LISTENER_HPP
 
 #include <memory>
+
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 namespace engine {
     /**
@@ -26,57 +28,52 @@ namespace engine {
     class state;
 
     /**
-     * Forward Listener
+     * Listener
      */
-    class listener;
+    class listener : public std::enable_shared_from_this<listener> {
+        /**
+         * IO Context
+         */
+        boost::asio::io_context &io_context_;
 
-    /**
-     * Server
-     */
-    class server : public std::enable_shared_from_this<server> {
+        /**
+         * Acceptor
+         */
+        boost::asio::ip::tcp::acceptor acceptor_;
+
         /**
          * State
          */
         std::shared_ptr<state> state_;
-
-        /**
-         * IO Context
-         */
-        boost::asio::io_context io_context_;
-
-        /**
-         * Port
-         */
-        unsigned short port_ = 0;
-      public:
+    public:
         /**
          * Constructor
-
-         * @param state
-         * @param port
-         */
-        explicit server(const std::shared_ptr<state> & state, unsigned short port = 0);
-
-        /**
-         * Get State
          *
-         * @return
+         * @param io_context
+         * @param endpoint
+         * @param state
          */
-        std::shared_ptr<state> get_state() const;
+        listener(boost::asio::io_context &io_context, const boost::asio::ip::tcp::endpoint &endpoint, const std::shared_ptr<state> &state);
 
         /**
          * Start
-         *
-         * @param number_of_threads
          */
-        void start(int number_of_threads = 1);
+        void start();
 
+    private:
+        /**
+         * Do Accept
+         */
+        void do_accept();
 
         /**
-         * Stop
+         * On Accept
+         *
+         * @param error_code
+         * @param socket
          */
-        void stop();
+        void on_accept(const boost::system::error_code &error_code, boost::asio::ip::tcp::socket socket);
     };
 }
 
-#endif // ENGINE_SERVER_HPP
+#endif // ENGINE_LISTENER_HPP

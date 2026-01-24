@@ -30,11 +30,13 @@ using namespace engine;
 TEST(session_test, it_can_handle_requests) {
     const auto _state = std::make_shared<state>();
 
-    _state->push_action(PING, [](const request &request, response &response, std::shared_ptr<state> state) {
+    _state->push_action(PING, [](const request &request, response &response, const std::shared_ptr<state> &state) {
         response.set_status(200);
     });
 
-    const auto _session = std::make_shared<session>(_state);
+    boost::asio::io_context _io_context;
+    boost::asio::ip::tcp::socket _socket { _io_context };
+    const auto _session = std::make_shared<session>(_state, std::move(_socket));
 
     const request _request(PING);
     const auto _response = _session->on_request(_request);

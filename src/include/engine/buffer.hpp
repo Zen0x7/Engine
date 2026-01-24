@@ -13,38 +13,30 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef ENGINE_REQUEST_HPP
-#define ENGINE_REQUEST_HPP
+#ifndef ENGINE_BUFFER_HPP
+#define ENGINE_BUFFER_HPP
 
-#include <algorithm>
-#include <engine/action.hpp>
+#ifndef ENGINE_BUFFER_SIZE
+#define ENGINE_BUFFER_SIZE 65536
+#endif
+
+#include <array>
 
 namespace engine {
-
     /**
-     * Request
+     * Buffer
      */
-    class request {
+    struct buffer {
         /**
-         * Action
+         * Storage
          */
-        action action_ = UNDEFINED;
-
-    public:
-        /**
-         * Constructor
-         *
-         * @param action
-         */
-        explicit request(action action = UNDEFINED);
+        std::array<std::byte, ENGINE_BUFFER_SIZE> storage_{};
 
         /**
-         * Get Action
-         *
-         * @return
+         * Used
          */
-        [[nodiscard]] action get_action() const;
+        bool used_ = false;
     };
 }
 
-#endif // ENGINE_REQUEST_HPP
+#endif // ENGINE_BUFFER_HPP

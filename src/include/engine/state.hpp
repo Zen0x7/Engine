@@ -22,6 +22,7 @@
 #include <memory>
 #include <boost/uuid/uuid.hpp>
 #include <unordered_map>
+#include <atomic>
 
 namespace engine {
     /**
@@ -37,6 +38,12 @@ namespace engine {
          * Callbacks
          */
         std::unordered_map<action, callback> actions_;
+
+        /**
+         * Port
+         */
+        std::atomic<unsigned short> port_ = 0;
+
     public:
         /**
          * Constructor
@@ -64,6 +71,18 @@ namespace engine {
          * @param callback
          */
         void push_action(action action, callback callback);
+
+        /**
+         * Set Port
+         *
+         * @param port
+         */
+        void set_port(unsigned short port);
+
+        /**
+         * Get Port
+         */
+        unsigned short get_port() const;
     };
 }
 

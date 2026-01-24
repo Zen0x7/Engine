@@ -23,5 +23,6 @@ int main() {
     auto _state = std::make_shared<state>();
     auto _server = std::make_shared<server>(_state);
 
+    _server->start();
     return 0;
 }
