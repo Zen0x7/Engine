@@ -66,8 +66,10 @@ namespace engine {
 
         /**
          * Start
+         *
+         * @param number_of_threads
          */
-        void start();
+        void start(int number_of_threads = 1);
 
 
         /**

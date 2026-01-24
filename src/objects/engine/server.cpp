@@ -27,18 +27,21 @@ namespace engine {
         return state_;
     }
 
-    void server::start() {
+    void server::start(const int number_of_threads) {
+        static_assert(number_of_threads > 0, "Number of threads must be greater than 0");
+
         auto _endpoint =  boost::asio::ip::tcp::endpoint{
             boost::asio::ip::make_address(
                 "0.0.0.0"),
             port_
         };
+
         const auto _listener = std::make_shared<listener>(io_context_, _endpoint, state_);
         _listener->start();
 
         std::vector<std::jthread> _threads;
-        _threads.reserve(3);
-        for (int i = 0; i < 3; i++) {
+        _threads.reserve(number_of_threads - 1);
+        for (int i = 0; i < number_of_threads - 1; i++) {
             _threads.emplace_back([this]() {
                 io_context_.run();
             });
