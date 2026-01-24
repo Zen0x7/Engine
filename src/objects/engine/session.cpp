@@ -26,9 +26,6 @@
 
 #include <boost/algorithm/hex.hpp>
 
-#include <iostream>
-
-
 namespace engine {
     session::session(const std::shared_ptr<state> &state, boost::asio::ip::tcp::socket socket) : state_(state),
         kernel_(std::make_unique<kernel>(state)),
@@ -48,8 +45,8 @@ namespace engine {
 
         async_read(
             socket_,
-            boost::asio::buffer(header_.data(), 4),
-            boost::asio::transfer_exactly(4),
+            boost::asio::buffer(header_.data(), ENGINE_SESSION_HEADER_LENGTH),
+            boost::asio::transfer_exactly(ENGINE_SESSION_HEADER_LENGTH),
             [_self](const boost::system::error_code &error_code, std::size_t bytes_transferred) {
                 boost::ignore_unused(bytes_transferred);
 
@@ -93,7 +90,7 @@ namespace engine {
 
         auto &_buffer = buffers_[offset];
 
-        std::span _bytes(_buffer.storage_.data(), bytes);
+        const std::span _bytes(_buffer.storage_.data(), bytes);
         std::string _printable;
         _printable.reserve(_bytes.size() * 2);
         boost::algorithm::hex(

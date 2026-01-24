@@ -28,6 +28,10 @@
 #define ENGINE_SESSION_BUFFERS_LENGTH 128
 #endif
 
+#ifndef ENGINE_SESSION_HEADER_LENGTH
+#define ENGINE_SESSION_HEADER_LENGTH 4
+#endif
+
 
 namespace engine {
     /**
@@ -62,7 +66,7 @@ namespace engine {
         /**
          * Current Header
          */
-        std::array<std::byte, 4> header_;
+        std::array<std::byte, ENGINE_SESSION_HEADER_LENGTH> header_;
     public:
         /**
          * Constructor
