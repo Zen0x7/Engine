@@ -26,7 +26,11 @@ namespace engine {
         std::size_t _offset = 1;
 
         for (std::uint8_t _i = 0; _i < _items; ++_i) {
-            const auto _length = std::to_integer<uint8_t>(data[_offset++]);
+            const std::uint16_t _length =
+                (std::to_integer<uint8_t>(data[_offset]) << 8) |
+                 std::to_integer<uint8_t>(data[_offset + 1]);
+
+            _offset += 2;
             const auto _entry = std::span<const std::byte>(data.data() + _offset, _length);
             _offset += _length;
             _result.push_back(request::from_binary(_entry));

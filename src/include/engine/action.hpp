@@ -29,6 +29,7 @@ namespace engine {
         UNSUBSCRIBE = 5,
         PUBLISH = 6,
         BROADCAST = 7,
+        SEND = 8,
     };
 }
 
