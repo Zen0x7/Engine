@@ -477,7 +477,7 @@ TEST(parser_test, it_can_parse_send) {
 
         // Length of entry
         std::byte{ 0x00 },
-        std::byte{ 0x1B },
+        std::byte{ 0x2D },
 
         // Entry type (1 byte, ie: 8 = SEND)
         std::byte{ 0x08 },
@@ -507,11 +507,33 @@ TEST(parser_test, it_can_parse_send) {
         std::byte{ 0x54 },
         std::byte{ 0x2A },
 
-        // 2° parameter length (2 bytes, ie: 5)
+        // 2° parameter length (2 bytes, ie: 16)
+        std::byte{ 0x00 },
+        std::byte{ 0x10 },
+
+        // 2° parameter value (16 bytes ... is a uuid v4)
+        std::byte{ 0xA0 },
+        std::byte{ 0xC0 },
+        std::byte{ 0xA0 },
+        std::byte{ 0xC0 },
+        std::byte{ 0x60 },
+        std::byte{ 0xB0 },
+        std::byte{ 0x40 },
+        std::byte{ 0x10 },
+        std::byte{ 0x90 },
+        std::byte{ 0xD0 },
+        std::byte{ 0x20 },
+        std::byte{ 0x80 },
+        std::byte{ 0x60 },
+        std::byte{ 0x00 },
+        std::byte{ 0x50 },
+        std::byte{ 0x20 },
+
+        // 3° parameter length (2 bytes, ie: 5)
         std::byte{ 0x00 },
         std::byte{ 0x05 },
 
-        // 2° parameter value (5 bytes ... is "hello")
+        // 3° parameter value (5 bytes ... is "hello")
         std::byte{ 0x68 },
         std::byte{ 0x65 },
         std::byte{ 0x6C },
@@ -523,7 +545,7 @@ TEST(parser_test, it_can_parse_send) {
 
     ASSERT_EQ(_result.size(), 1);
     ASSERT_EQ(_result[0].get_action(), SEND);
-    ASSERT_EQ(_result[0].get_parameters().size(), 2);
+    ASSERT_EQ(_result[0].get_parameters().size(), 3);
     ASSERT_EQ(_result[0].get_parameters()[0].size(), 16);
     ASSERT_EQ(_result[0].get_parameters()[0][0], std::byte{ 0xA2 });
     ASSERT_EQ(_result[0].get_parameters()[0][1], std::byte{ 0xCF });
@@ -541,11 +563,28 @@ TEST(parser_test, it_can_parse_send) {
     ASSERT_EQ(_result[0].get_parameters()[0][13], std::byte{ 0x0B });
     ASSERT_EQ(_result[0].get_parameters()[0][14], std::byte{ 0x54 });
     ASSERT_EQ(_result[0].get_parameters()[0][15], std::byte{ 0x2A });
-    ASSERT_EQ(_result[0].get_parameters()[1].size(), 5);
-    ASSERT_EQ(_result[0].get_parameters()[1][0], std::byte{ 0x68 });
-    ASSERT_EQ(_result[0].get_parameters()[1][1], std::byte{ 0x65 });
-    ASSERT_EQ(_result[0].get_parameters()[1][2], std::byte{ 0x6C });
-    ASSERT_EQ(_result[0].get_parameters()[1][3], std::byte{ 0x6C });
-    ASSERT_EQ(_result[0].get_parameters()[1][4], std::byte{ 0x6F });
+    ASSERT_EQ(_result[0].get_parameters()[1].size(), 16);
+    ASSERT_EQ(_result[0].get_parameters()[1][0], std::byte{ 0xA0 });
+    ASSERT_EQ(_result[0].get_parameters()[1][1], std::byte{ 0xC0 });
+    ASSERT_EQ(_result[0].get_parameters()[1][2], std::byte{ 0xA0 });
+    ASSERT_EQ(_result[0].get_parameters()[1][3], std::byte{ 0xC0 });
+    ASSERT_EQ(_result[0].get_parameters()[1][4], std::byte{ 0x60 });
+    ASSERT_EQ(_result[0].get_parameters()[1][5], std::byte{ 0xB0 });
+    ASSERT_EQ(_result[0].get_parameters()[1][6], std::byte{ 0x40 });
+    ASSERT_EQ(_result[0].get_parameters()[1][7], std::byte{ 0x10 });
+    ASSERT_EQ(_result[0].get_parameters()[1][8], std::byte{ 0x90 });
+    ASSERT_EQ(_result[0].get_parameters()[1][9], std::byte{ 0xD0 });
+    ASSERT_EQ(_result[0].get_parameters()[1][10], std::byte{ 0x20 });
+    ASSERT_EQ(_result[0].get_parameters()[1][11], std::byte{ 0x80 });
+    ASSERT_EQ(_result[0].get_parameters()[1][12], std::byte{ 0x60 });
+    ASSERT_EQ(_result[0].get_parameters()[1][13], std::byte{ 0x00 });
+    ASSERT_EQ(_result[0].get_parameters()[1][14], std::byte{ 0x50 });
+    ASSERT_EQ(_result[0].get_parameters()[1][15], std::byte{ 0x20 });
+    ASSERT_EQ(_result[0].get_parameters()[2].size(), 5);
+    ASSERT_EQ(_result[0].get_parameters()[2][0], std::byte{ 0x68 });
+    ASSERT_EQ(_result[0].get_parameters()[2][1], std::byte{ 0x65 });
+    ASSERT_EQ(_result[0].get_parameters()[2][2], std::byte{ 0x6C });
+    ASSERT_EQ(_result[0].get_parameters()[2][3], std::byte{ 0x6C });
+    ASSERT_EQ(_result[0].get_parameters()[2][4], std::byte{ 0x6F });
 }
 
