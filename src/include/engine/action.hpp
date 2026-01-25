@@ -23,6 +23,13 @@ namespace engine {
     enum action {
         UNDEFINED = 0,
         PING = 1,
+        JOIN = 2,
+        LEAVE = 3,
+        SUBSCRIBE = 4,
+        UNSUBSCRIBE = 5,
+        PUBLISH = 6,
+        BROADCAST = 7,
+        SEND = 8,
     };
 }
 

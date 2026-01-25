@@ -49,7 +49,7 @@ TEST_F(listener_test, it_can_handle_headers) {
     std::array _payload { std::byte{0x00}, std::byte{0x00}, std::byte{0x00}, std::byte{0x00} };
     boost::asio::write(_socket, boost::asio::buffer(_payload));
 
-    std::array<std::byte, 2> _response;
+    std::array _response { std::byte{0xFF}, std::byte{0xFF} };
     boost::asio::read(_socket, boost::asio::buffer(_response, 2));
 
     ASSERT_EQ(_response[0], std::byte{ 0x00 });
