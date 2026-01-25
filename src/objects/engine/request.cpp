@@ -15,11 +15,40 @@
 
 #include <engine/request.hpp>
 
+#include <cstdint>
+#include <cstring>
+
 namespace engine {
     request::request(const action action) : action_(action) {
     }
 
     action request::get_action() const {
         return action_;
+    }
+
+    std::vector<std::span<const std::byte> > &request::get_parameters() {
+        return parameters_;
+    }
+
+    request request::from_binary(const std::span<const std::byte> data) {
+        std::size_t _offset = 0;
+
+        const auto _action = static_cast<action>(std::to_integer<std::uint8_t>(data[_offset++]));
+        request _req(_action);
+
+        const auto _parameters_length = std::to_integer<std::uint8_t>(data[_offset++]);
+
+        for (std::uint8_t _i = 0; _i < _parameters_length; ++_i) {
+            const std::uint16_t _length =
+                    std::to_integer<uint8_t>(data[_offset]) << 8 |
+                    std::to_integer<uint8_t>(data[_offset + 1]);
+
+            _offset += 2;
+
+            _req.parameters_.push_back(data.subspan(_offset, _length));
+            _offset += _length;
+        }
+
+        return _req;
     }
 }

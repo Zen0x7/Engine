@@ -13,23 +13,27 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef ENGINE_ACTION_HPP
-#define ENGINE_ACTION_HPP
+#ifndef ENGINE_PARSE_HPP
+#define ENGINE_PARSE_HPP
+
+#include <engine/request.hpp>
 
 namespace engine {
-    /**
-     * Action
-     */
-    enum action {
-        UNDEFINED = 0,
-        PING = 1,
-        JOIN = 2,
-        LEAVE = 3,
-        SUBSCRIBE = 4,
-        UNSUBSCRIBE = 5,
-        PUBLISH = 6,
-        BROADCAST = 7,
-    };
+    inline std::vector<request> parse(std::span<std::byte> data) {
+        std::vector<request> _result;
+
+        const auto _items = std::to_integer<uint8_t>(data[0]);
+        std::size_t _offset = 1;
+
+        for (std::uint8_t _i = 0; _i < _items; ++_i) {
+            const auto _length = std::to_integer<uint8_t>(data[_offset++]);
+            const auto _entry = std::span<const std::byte>(data.data() + _offset, _length);
+            _offset += _length;
+            _result.push_back(request::from_binary(_entry));
+        }
+
+        return _result;
+    }
 }
 
-#endif // ENGINE_ACTION_HPP
+#endif // ENGINE_PARSE_HPP

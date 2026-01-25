@@ -16,8 +16,9 @@
 #ifndef ENGINE_REQUEST_HPP
 #define ENGINE_REQUEST_HPP
 
-#include <algorithm>
 #include <engine/action.hpp>
+#include <span>
+#include <vector>
 
 namespace engine {
 
@@ -29,6 +30,11 @@ namespace engine {
          * Action
          */
         action action_ = UNDEFINED;
+
+        /**
+         * Parameters
+         */
+        std::vector<std::span<const std::byte>> parameters_;
 
     public:
         /**
@@ -44,6 +50,20 @@ namespace engine {
          * @return
          */
         [[nodiscard]] action get_action() const;
+
+        /**
+         * Get Parameters
+         * @return
+         */
+        [[nodiscard]] std::vector<std::span<const std::byte>> &get_parameters();
+
+        /**
+         * From Binary
+         *
+         * @param data
+         * @return
+         */
+        static request from_binary(std::span<const std::byte> data);
     };
 }
 
