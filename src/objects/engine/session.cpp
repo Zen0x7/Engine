@@ -33,6 +33,8 @@
 #include <engine/parse.hpp>
 #include <engine/state.hpp>
 
+#include <engine/crc.hpp>
+
 namespace engine {
     session::session(const std::shared_ptr<state> &state,
                      boost::asio::ip::tcp::socket socket) : id_(boost::uuids::random_generator()()),
@@ -80,28 +82,21 @@ namespace engine {
 
         async_read(
             socket_,
-            boost::asio::buffer(_buffer.storage_.data(), pending_bytes),
-            boost::asio::transfer_exactly(pending_bytes),
+            boost::asio::buffer(_buffer.storage_.data(), pending_bytes + 4),
+            boost::asio::transfer_exactly(pending_bytes + 4),
             boost::beast::bind_front_handler(&session::on_payload, shared_from_this()));
     }
 
     void session::handle_payload(const std::size_t offset, const std::size_t bytes) {
         auto &_buffer = buffers_[offset];
-
         const std::span _bytes(_buffer.storage_.data(), bytes);
-        std::string _printable;
-        _printable.reserve(_bytes.size() * 2);
-        boost::algorithm::hex(
-            reinterpret_cast<const unsigned char *>(_bytes.data()),
-            reinterpret_cast<const unsigned char *>(_bytes.data()) + _bytes.size(),
-            std::back_inserter(_printable)
-        );
 
-        auto _requests = parse(_buffer.storage_);
 
-        for (auto &_request : _requests) {
-            auto _response = kernel_->handle(_request);
-            send(std::make_shared<std::vector<std::byte> const>(_response.to_binary()));
+        if (crc_check(_bytes)) {
+            for (auto _requests = parse(_buffer.storage_); auto &_request: _requests) {
+                auto _response = kernel_->handle(_request);
+                send(std::make_shared<std::vector<std::byte> const>(_response.to_binary()));
+            }
         }
     }
 

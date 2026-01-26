@@ -21,6 +21,7 @@
 
 #include <engine/request.hpp>
 #include <boost/endian/conversion.hpp>
+#include <boost/crc.hpp>
 
 namespace engine {
     inline std::vector<std::byte> serialize_requests(const std::vector<request>& requests) {
@@ -32,7 +33,7 @@ namespace engine {
                 _total_length += 2 + _field.size();
             }
         }
-        _result.reserve(_total_length);
+        _result.reserve(_total_length + 4);
 
         _result.push_back(std::byte{ static_cast<std::uint8_t>(requests.size()) });
 
@@ -48,6 +49,15 @@ namespace engine {
             _result.insert(_result.end(), _p, _p + sizeof(_length));
             _result.insert(_result.end(), _entry.begin(), _entry.end());
         }
+
+        boost::crc_32_type _crc;
+        _crc.process_bytes(_result.data(), _result.size());
+
+        const std::uint32_t _crc_value =
+            boost::endian::native_to_big(_crc.checksum());
+
+        const auto* _c = reinterpret_cast<const std::byte*>(&_crc_value);
+        _result.insert(_result.end(), _c, _c + sizeof(_crc_value));
 
         return _result;
     }

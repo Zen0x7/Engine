@@ -58,7 +58,7 @@ TEST(serialize_test, it_can_serialize_requests) {
 
     auto _serialized = serialize_requests({ _join_request, _subscribe_request });
 
-    ASSERT_EQ(_serialized.size(), 84);
+    ASSERT_EQ(_serialized.size(), 88);
     ASSERT_EQ(_serialized[0], std::byte{ 0x02 });
     ASSERT_EQ(_serialized[1], std::byte{ 0x00 });
     ASSERT_EQ(_serialized[2], std::byte{ 0x24 });

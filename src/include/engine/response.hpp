@@ -18,12 +18,19 @@
 
 #include <cstdint>
 #include <vector>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid.hpp>
 
 namespace engine {
     /**
      * Response
      */
     class response {
+        /**
+         * ID
+         */
+        boost::uuids::uuid id_;
+
         /**
          * Resolved
          */
@@ -49,6 +56,8 @@ namespace engine {
          */
         int status_ = 0;
     public:
+        explicit response(boost::uuids::uuid id = boost::uuids::random_generator()());
+
         /**
          * Mark As Resolved
          */
@@ -100,6 +109,13 @@ namespace engine {
          * @param status
          */
         void set_status(int status);
+
+        /**
+         * Get ID
+         *
+         * @return
+         */
+        boost::uuids::uuid get_id() const;
 
         /**
          * To Binary
