@@ -18,6 +18,9 @@
 
 #include <engine/request.hpp>
 
+#include <boost/endian/conversion.hpp>
+#include <cstring>
+
 namespace engine {
     inline std::vector<request> parse(std::span<std::byte> data) {
         std::vector<request> _result;
@@ -26,11 +29,13 @@ namespace engine {
         std::size_t _offset = 1;
 
         for (std::uint8_t _i = 0; _i < _items; ++_i) {
-            const std::uint16_t _length =
-                (std::to_integer<uint8_t>(data[_offset]) << 8) |
-                 std::to_integer<uint8_t>(data[_offset + 1]);
+            std::uint16_t _length_be;
+            std::memcpy(&_length_be, data.data() + _offset, sizeof(_length_be));
+            _offset += sizeof(_length_be);
 
-            _offset += 2;
+            const std::uint16_t _length =
+                boost::endian::big_to_native(_length_be);
+
             const auto _entry = std::span<const std::byte>(data.data() + _offset, _length);
             _offset += _length;
             _result.push_back(request::from_binary(_entry));

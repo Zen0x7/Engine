@@ -65,6 +65,13 @@ namespace engine {
          * @return
          */
         static request from_binary(std::span<const std::byte> data);
+
+        /**
+         * To Binary
+         *
+         * @return
+         */
+        [[nodiscard]] std::vector<std::byte> to_binary() const;
     };
 }
 
