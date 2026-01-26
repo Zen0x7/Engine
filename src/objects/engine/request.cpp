@@ -16,6 +16,7 @@
 #include <engine/request.hpp>
 
 #include <cstdint>
+#include <boost/endian/conversion.hpp>
 
 namespace engine {
     request::request(const action action) : action_(action) {
@@ -38,16 +39,45 @@ namespace engine {
         const auto _fields_length = std::to_integer<std::uint8_t>(data[_offset++]);
 
         for (std::uint8_t _i = 0; _i < _fields_length; ++_i) {
-            const std::uint16_t _length =
-                    std::to_integer<std::uint8_t>(data[_offset]) << 8 |
-                    std::to_integer<std::uint8_t>(data[_offset + 1]);
+            std::uint16_t _length_be;
+            std::memcpy(&_length_be, data.data() + _offset, sizeof(_length_be));
+            _offset += sizeof(_length_be);
 
-            _offset += 2;
+            const std::uint16_t _length =
+                boost::endian::big_to_native(_length_be);
 
             _req.fields_.push_back(data.subspan(_offset, _length));
             _offset += _length;
         }
 
         return _req;
+    }
+
+    std::vector<std::byte> request::to_binary() const {
+        std::vector<std::byte> _result;
+        std::size_t _total_size = 0;
+        for (const auto& _field : fields_) {
+            _total_size += 2 + static_cast<std::uint16_t>(_field.size());
+        }
+
+        _result.reserve(2 + _total_size);
+
+        _result.push_back(std::byte{ static_cast<std::uint8_t>(action_) });
+        _result.push_back(std::byte{ static_cast<std::uint8_t>(fields_.size()) });
+
+        for (const auto& _field : fields_) {
+
+            const std::uint16_t _length =
+                boost::endian::native_to_big(
+                    static_cast<std::uint16_t>(_field.size())
+                );
+
+            const auto* _p = reinterpret_cast<const std::byte*>(&_length);
+            _result.insert(_result.end(), _p, _p + sizeof(_length));
+
+            _result.insert(_result.end(), _field.begin(), _field.end());
+        }
+
+        return _result;
     }
 }
