@@ -17,6 +17,9 @@
 #include <chrono>
 
 namespace engine {
+    response::response(const boost::uuids::uuid id) : id_(id) {
+    }
+
     void response::mark_as_resolved() {
         resolved_ = true;
         resolved_at_ = std::chrono::high_resolution_clock::now().time_since_epoch().count();
@@ -49,5 +52,26 @@ namespace engine {
 
     void response::set_status(const int status) {
         status_ = status;
+    }
+
+    boost::uuids::uuid response::get_id() const {
+        return id_;
+    }
+
+    std::vector<std::byte> response::to_binary() const {
+        std::vector<std::byte> _result;
+        _result.reserve(16 + 1);
+
+        const auto* _id_bytes = reinterpret_cast<const std::byte*>(id_.data());
+
+        _result.insert(_result.end(), _id_bytes, _id_bytes + 16);
+
+        _result.push_back(
+            static_cast<std::byte>(
+                static_cast<std::uint8_t>(status_)
+            )
+        );
+
+        return _result;
     }
 }

@@ -19,6 +19,9 @@
 #include <engine/action.hpp>
 #include <span>
 #include <vector>
+#include <boost/uuid/random_generator.hpp>
+
+#include <boost/uuid/uuid.hpp>
 
 namespace engine {
 
@@ -26,6 +29,11 @@ namespace engine {
      * Request
      */
     class request {
+        /**
+         * ID
+         */
+        boost::uuids::uuid id_;
+
         /**
          * Action
          */
@@ -41,8 +49,16 @@ namespace engine {
          * Constructor
          *
          * @param action
+         * @param id
          */
-        explicit request(action action = UNDEFINED);
+        explicit request(action action = UNDEFINED, boost::uuids::uuid id = boost::uuids::random_generator()());
+
+        /**
+         * Get ID
+         *
+         * @return
+         */
+        [[nodiscard]] boost::uuids::uuid get_id() const;
 
         /**
          * Get Action

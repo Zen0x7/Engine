@@ -27,7 +27,7 @@ namespace engine {
     }
 
     response kernel::handle(const request &request) const {
-        response _response;
+        response _response(request.get_id());
 
         const auto _actions = state_->get_actions();
 

@@ -17,6 +17,7 @@
 #include <engine/state.hpp>
 #include <engine/server.hpp>
 
+// LCOV_EXCL_START
 int main() {
     using namespace engine;
 
@@ -26,3 +27,4 @@ int main() {
     _server->start();
     return 0;
 }
+// LCOV_EXCL_STOP

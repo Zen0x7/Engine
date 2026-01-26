@@ -17,9 +17,14 @@
 
 #include <cstdint>
 #include <boost/endian/conversion.hpp>
+#include <boost/uuid/uuid.hpp>
 
 namespace engine {
-    request::request(const action action) : action_(action) {
+    request::request(const action action, const boost::uuids::uuid id) : id_(id), action_(action) {
+    }
+
+    boost::uuids::uuid request::get_id() const {
+        return id_;
     }
 
     action request::get_action() const {
@@ -31,10 +36,17 @@ namespace engine {
     }
 
     request request::from_binary(const std::span<const std::byte> data) {
-        std::size_t _offset = 0;
+        std::size_t _offset = 16;
+
+        boost::uuids::uuid _id{};
+        std::copy_n(
+            reinterpret_cast<const unsigned char*>(data.data()),
+            16,
+            _id.begin()
+        );
 
         const auto _action = static_cast<action>(std::to_integer<std::uint8_t>(data[_offset++]));
-        request _req(_action);
+        request _req(_action, _id);
 
         const auto _fields_length = std::to_integer<std::uint8_t>(data[_offset++]);
 
@@ -60,7 +72,13 @@ namespace engine {
             _total_size += 2 + static_cast<std::uint16_t>(_field.size());
         }
 
-        _result.reserve(2 + _total_size);
+        _result.reserve(16 + 2 + _total_size);
+
+        _result.insert(
+            _result.end(),
+            reinterpret_cast<const std::byte*>(id_.data()),
+            reinterpret_cast<const std::byte*>(id_.data()) + 16
+        );
 
         _result.push_back(std::byte{ static_cast<std::uint8_t>(action_) });
         _result.push_back(std::byte{ static_cast<std::uint8_t>(fields_.size()) });

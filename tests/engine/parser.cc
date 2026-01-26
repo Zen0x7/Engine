@@ -17,6 +17,8 @@
 
 #include <engine/parse.hpp>
 
+#include <boost/uuid/uuid_io.hpp>
+
 using namespace engine;
 
 TEST(parser_test, it_can_parse_join) {
@@ -25,7 +27,25 @@ TEST(parser_test, it_can_parse_join) {
 
         // Length of entry
         std::byte{ 0x00 },
-        std::byte{ 0x14 },
+        std::byte{ 0x24 },
+
+        // Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
+        std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x19 },
 
         // Entry type (1 byte, ie: 2 = JOIN)
         std::byte{ 0x02 },
@@ -59,6 +79,7 @@ TEST(parser_test, it_can_parse_join) {
     auto _requests = parse(_stream);
 
     ASSERT_EQ(_requests.size(), 1);
+    ASSERT_EQ(to_string(_requests[0].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd919");
     ASSERT_EQ(_requests[0].get_action(), JOIN);
     ASSERT_EQ(_requests[0].get_fields().size(), 1);
     ASSERT_EQ(_requests[0].get_fields()[0].size(), 16);
@@ -86,7 +107,25 @@ TEST(parser_test, it_can_parse_leave) {
 
         // Length of entry
         std::byte{ 0x00 },
-        std::byte{ 0x14 },
+        std::byte{ 0x24 },
+
+        // Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
+        std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x19 },
 
         // Entry type (1 byte, ie: 3 = LEAVE)
         std::byte{ 0x03 },
@@ -121,6 +160,7 @@ TEST(parser_test, it_can_parse_leave) {
 
     ASSERT_EQ(_requests.size(), 1);
     ASSERT_EQ(_requests[0].get_action(), LEAVE);
+    ASSERT_EQ(to_string(_requests[0].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd919");
     ASSERT_EQ(_requests[0].get_fields().size(), 1);
     ASSERT_EQ(_requests[0].get_fields()[0].size(), 16);
     ASSERT_EQ(_requests[0].get_fields()[0][0], std::byte{ 0xA2 });
@@ -147,7 +187,25 @@ TEST(parser_test, it_can_parse_subscribe) {
 
         // Length of entry
         std::byte{ 0x00 },
+        std::byte{ 0x2B },
+
+        // Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
         std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x19 },
 
         // Entry type (1 byte, ie: 4 = SUBSCRIBE)
         std::byte{ 0x04 },
@@ -192,6 +250,7 @@ TEST(parser_test, it_can_parse_subscribe) {
     auto _requests = parse(_stream);
 
     ASSERT_EQ(_requests.size(), 1);
+    ASSERT_EQ(to_string(_requests[0].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd919");
     ASSERT_EQ(_requests[0].get_action(), SUBSCRIBE);
     ASSERT_EQ(_requests[0].get_fields().size(), 2);
     ASSERT_EQ(_requests[0].get_fields()[0].size(), 16);
@@ -225,7 +284,25 @@ TEST(parser_test, it_can_parse_unsubscribe) {
 
         // Length of entry
         std::byte{ 0x00 },
+        std::byte{ 0x2B },
+
+        // Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
         std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x19 },
 
         // Entry type (1 byte, ie: 5 = UNSUBSCRIBE)
         std::byte{ 0x05 },
@@ -270,6 +347,7 @@ TEST(parser_test, it_can_parse_unsubscribe) {
     auto _requests = parse(_stream);
 
     ASSERT_EQ(_requests.size(), 1);
+    ASSERT_EQ(to_string(_requests[0].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd919");
     ASSERT_EQ(_requests[0].get_action(), UNSUBSCRIBE);
     ASSERT_EQ(_requests[0].get_fields().size(), 2);
     ASSERT_EQ(_requests[0].get_fields()[0].size(), 16);
@@ -303,7 +381,25 @@ TEST(parser_test, it_can_parse_publish) {
 
         // Length of entry
         std::byte{ 0x00 },
-        std::byte{ 0x22 },
+        std::byte{ 0x32 },
+
+        // Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
+        std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x19 },
 
         // Entry type (1 byte, ie: 6 = PUBLISH)
         std::byte{ 0x06 },
@@ -359,6 +455,7 @@ TEST(parser_test, it_can_parse_publish) {
     auto _requests = parse(_stream);
 
     ASSERT_EQ(_requests.size(), 1);
+    ASSERT_EQ(to_string(_requests[0].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd919");
     ASSERT_EQ(_requests[0].get_action(), PUBLISH);
     ASSERT_EQ(_requests[0].get_fields().size(), 3);
     ASSERT_EQ(_requests[0].get_fields()[0].size(), 16);
@@ -398,7 +495,25 @@ TEST(parser_test, it_can_parse_broadcast) {
 
         // Length of entry
         std::byte{ 0x00 },
+        std::byte{ 0x2B },
+
+        // Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
         std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x19 },
 
         // Entry type (1 byte, ie: 7 = BROADCAST)
         std::byte{ 0x07 },
@@ -443,6 +558,7 @@ TEST(parser_test, it_can_parse_broadcast) {
     auto _requests = parse(_stream);
 
     ASSERT_EQ(_requests.size(), 1);
+    ASSERT_EQ(to_string(_requests[0].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd919");
     ASSERT_EQ(_requests[0].get_action(), BROADCAST);
     ASSERT_EQ(_requests[0].get_fields().size(), 2);
     ASSERT_EQ(_requests[0].get_fields()[0].size(), 16);
@@ -477,7 +593,25 @@ TEST(parser_test, it_can_parse_send) {
 
         // Length of entry
         std::byte{ 0x00 },
-        std::byte{ 0x2D },
+        std::byte{ 0x3D },
+
+        // Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
+        std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x19 },
 
         // Entry type (1 byte, ie: 8 = SEND)
         std::byte{ 0x08 },
@@ -544,6 +678,7 @@ TEST(parser_test, it_can_parse_send) {
     auto _requests = parse(_stream);
 
     ASSERT_EQ(_requests.size(), 1);
+    ASSERT_EQ(to_string(_requests[0].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd919");
     ASSERT_EQ(_requests[0].get_action(), SEND);
     ASSERT_EQ(_requests[0].get_fields().size(), 3);
     ASSERT_EQ(_requests[0].get_fields()[0].size(), 16);
@@ -594,7 +729,25 @@ TEST(parser_test, it_can_parse_requests_batch) {
 
         // 1° Entry length
         std::byte{ 0x00 },
+        std::byte{ 0x2B },
+
+        // 1° Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
         std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x19 },
 
         // 1° Entry type (1 byte, ie: 7 = BROADCAST)
         std::byte{ 0x07 },
@@ -637,7 +790,25 @@ TEST(parser_test, it_can_parse_requests_batch) {
 
         // 2° Entry length
         std::byte{ 0x00 },
+        std::byte{ 0x2B },
+
+        // 2° Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
         std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x20 },
 
         // 2° Entry type (1 byte, ie: 5 = UNSUBSCRIBE)
         std::byte{ 0x05 },
@@ -678,10 +849,27 @@ TEST(parser_test, it_can_parse_requests_batch) {
         std::byte{ 0x6C },
         std::byte{ 0x64 },
 
-
         // 3° Entry length
         std::byte{ 0x00 },
-        std::byte{ 0x14 },
+        std::byte{ 0x24 },
+
+        // 3° Request ID
+        std::byte{ 0xC8 },
+        std::byte{ 0xA3 },
+        std::byte{ 0x7D },
+        std::byte{ 0xF6 },
+        std::byte{ 0x24 },
+        std::byte{ 0x09 },
+        std::byte{ 0x42 },
+        std::byte{ 0x1B },
+        std::byte{ 0x90 },
+        std::byte{ 0x19 },
+        std::byte{ 0x5F },
+        std::byte{ 0xC2 },
+        std::byte{ 0x3E },
+        std::byte{ 0x1F },
+        std::byte{ 0xD9 },
+        std::byte{ 0x21 },
 
         // 3° Entry type (1 byte, ie: 2 = JOIN)
         std::byte{ 0x02 },
@@ -716,6 +904,7 @@ TEST(parser_test, it_can_parse_requests_batch) {
 
     ASSERT_EQ(_requests.size(), 3);
 
+    ASSERT_EQ(to_string(_requests[0].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd919");
     ASSERT_EQ(_requests[0].get_action(), BROADCAST);
     ASSERT_EQ(_requests[0].get_fields().size(), 2);
     ASSERT_EQ(_requests[0].get_fields()[0].size(), 16);
@@ -742,6 +931,7 @@ TEST(parser_test, it_can_parse_requests_batch) {
     ASSERT_EQ(_requests[0].get_fields()[1][3], std::byte{ 0x6C });
     ASSERT_EQ(_requests[0].get_fields()[1][4], std::byte{ 0x6F });
 
+    ASSERT_EQ(to_string(_requests[1].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd920");
     ASSERT_EQ(_requests[1].get_action(), UNSUBSCRIBE);
     ASSERT_EQ(_requests[1].get_fields().size(), 2);
     ASSERT_EQ(_requests[1].get_fields()[0].size(), 16);
@@ -768,6 +958,7 @@ TEST(parser_test, it_can_parse_requests_batch) {
     ASSERT_EQ(_requests[1].get_fields()[1][3], std::byte{ 0x6C });
     ASSERT_EQ(_requests[1].get_fields()[1][4], std::byte{ 0x64 });
 
+    ASSERT_EQ(to_string(_requests[2].get_id()), "c8a37df6-2409-421b-9019-5fc23e1fd921");
     ASSERT_EQ(_requests[2].get_action(), JOIN);
     ASSERT_EQ(_requests[2].get_fields().size(), 1);
     ASSERT_EQ(_requests[2].get_fields()[0].size(), 16);
