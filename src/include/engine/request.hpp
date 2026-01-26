@@ -32,9 +32,9 @@ namespace engine {
         action action_ = UNDEFINED;
 
         /**
-         * Parameters
+         * Fields
          */
-        std::vector<std::span<const std::byte>> parameters_;
+        std::vector<std::span<const std::byte>> fields_;
 
     public:
         /**
@@ -52,11 +52,11 @@ namespace engine {
         [[nodiscard]] action get_action() const;
 
         /**
-         * Get Parameters
-         * 
+         * Get Fields
+         *
          * @return
          */
-        [[nodiscard]] std::vector<std::span<const std::byte>> &get_parameters();
+        [[nodiscard]] std::vector<std::span<const std::byte>> &get_fields();
 
         /**
          * From Binary
