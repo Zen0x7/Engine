@@ -30,6 +30,7 @@
 
 #include <boost/algorithm/hex.hpp>
 #include <boost/beast/core/bind_handler.hpp>
+#include <engine/parse.hpp>
 #include <engine/state.hpp>
 
 namespace engine {
@@ -96,10 +97,12 @@ namespace engine {
             std::back_inserter(_printable)
         );
 
-        std::cout << _printable << std::endl;
+        auto _requests = parse(_buffer.storage_);
 
-        std::vector _response = {std::byte{0x00}, std::byte{0x01}};
-        send(std::make_shared<std::vector<std::byte> const>(_response));
+        for (auto &_request : _requests) {
+            auto _response = kernel_->handle(_request);
+            send(std::make_shared<std::vector<std::byte> const>(_response.to_binary()));
+        }
     }
 
     bool session::buffer_is_last() const {

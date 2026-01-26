@@ -17,6 +17,7 @@
 #define ENGINE_RESPONSE_HPP
 
 #include <cstdint>
+#include <vector>
 
 namespace engine {
     /**
@@ -63,35 +64,35 @@ namespace engine {
          *
          * @return
          */
-        bool get_resolved() const;
+        [[nodiscard]] bool get_resolved() const;
 
         /**
          * Get Resolved At
          *
          * @return
          */
-        std::uint64_t get_resolved_at() const;
+        [[nodiscard]] std::uint64_t get_resolved_at() const;
 
         /**
          * Get Handled
          *
          * @return
          */
-        bool get_handled() const;
+        [[nodiscard]] bool get_handled() const;
 
         /**
          * Get Handled At
          *
          * @return
          */
-        std::uint64_t get_handled_at() const;
+        [[nodiscard]] std::uint64_t get_handled_at() const;
 
         /**
          * Get Status
          *
          * @return
          */
-        int get_status() const;
+        [[nodiscard]] int get_status() const;
 
         /**
          * Set Status
@@ -99,6 +100,13 @@ namespace engine {
          * @param status
          */
         void set_status(int status);
+
+        /**
+         * To Binary
+         *
+         * @return
+         */
+        [[nodiscard]] std::vector<std::byte> to_binary() const;
     };
 }
 

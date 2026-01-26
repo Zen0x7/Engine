@@ -50,4 +50,8 @@ namespace engine {
     void response::set_status(const int status) {
         status_ = status;
     }
+
+    std::vector<std::byte> response::to_binary() const {
+
+    }
 }
