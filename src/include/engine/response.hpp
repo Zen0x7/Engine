@@ -55,7 +55,17 @@ namespace engine {
          * Status
          */
         int status_ = 0;
+
+        /**
+         * Fields
+         */
+        std::vector<std::vector<std::byte>> fields_;
     public:
+        /**
+         * Constructor
+         *
+         * @param id
+         */
         explicit response(boost::uuids::uuid id = boost::uuids::random_generator()());
 
         /**
@@ -115,7 +125,14 @@ namespace engine {
          *
          * @return
          */
-        boost::uuids::uuid get_id() const;
+        [[nodiscard]] boost::uuids::uuid get_id() const;
+
+        /**
+         * Get Fields
+         *
+         * @return
+         */
+        std::vector<std::vector<std::byte>> & get_fields();
 
         /**
          * To Binary

@@ -22,7 +22,7 @@ int main() {
     using namespace engine;
 
     auto _state = std::make_shared<state>();
-    auto _server = std::make_shared<server>(_state);
+    const auto _server = std::make_shared<server>(_state);
 
     _server->start();
     return 0;

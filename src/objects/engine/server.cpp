@@ -16,6 +16,8 @@
 #include <engine/server.hpp>
 #include <engine/state.hpp>
 #include <engine/listener.hpp>
+#include <engine/request.hpp>
+#include <engine/response.hpp>
 
 #include <thread>
 
@@ -34,6 +36,8 @@ namespace engine {
             port_
         };
 
+        register_actions();
+
         const auto _listener = std::make_shared<listener>(io_context_, _endpoint, state_);
         _listener->start();
 
@@ -49,5 +53,15 @@ namespace engine {
 
     void server::stop() {
         io_context_.stop();
+    }
+
+    void server::register_actions() const {
+        state_->push_action(PING, [](const request &request, response &response, const std::shared_ptr<state> &state) {
+            response.set_status(200);
+        });
+
+        state_->push_action(JOIN, [](const request &request, response &response, const std::shared_ptr<state> &state) {
+            response.set_status(200);
+        });
     }
 }

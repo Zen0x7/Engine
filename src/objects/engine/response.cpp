@@ -15,6 +15,7 @@
 
 #include <engine/response.hpp>
 #include <chrono>
+#include <boost/endian.hpp>
 
 namespace engine {
     response::response(const boost::uuids::uuid id) : id_(id) {
@@ -58,9 +59,20 @@ namespace engine {
         return id_;
     }
 
+    std::vector<std::vector<std::byte>> & response::get_fields() {
+        return fields_;
+    }
+
     std::vector<std::byte> response::to_binary() const {
         std::vector<std::byte> _result;
-        _result.reserve(16 + 1);
+        _result.reserve(16 + 1 + 1);
+
+        std::size_t _fields_size = 0;
+        for (const auto &_field : fields_) {
+            _fields_size += _field.size() + sizeof(std::uint16_t);
+        }
+
+        _result.reserve(16 + 1 + 1 + _fields_size);
 
         const auto* _id_bytes = reinterpret_cast<const std::byte*>(id_.data());
 
@@ -71,6 +83,17 @@ namespace engine {
                 static_cast<std::uint8_t>(status_)
             )
         );
+
+        _result.push_back(static_cast<std::byte>(fields_.size()));
+
+        for (auto &_field : fields_) {
+            boost::endian::big_uint16_t _size = static_cast<std::uint16_t>(_field.size());
+
+            const auto* _size_bytes = reinterpret_cast<const std::byte*>(&_size);
+
+            _result.insert(_result.end(), _size_bytes, _size_bytes + sizeof(_size));
+            _result.insert(_result.end(), _field.begin(), _field.end());
+        }
 
         return _result;
     }

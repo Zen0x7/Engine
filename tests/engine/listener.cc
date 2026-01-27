@@ -25,6 +25,8 @@
 #include <engine/request.hpp>
 #include <engine/serialize.hpp>
 
+using namespace engine;
+
 TEST_F(listener_test, it_can_open_a_local_port) {
     ASSERT_NE(server_->get_state()->get_port(), 0);
 }
@@ -47,7 +49,7 @@ TEST_F(listener_test, it_can_handle_requests) {
     const auto _results = _resolver.resolve("localhost", std::to_string(server_->get_state()->get_port()));
     boost::asio::connect(_socket, _results);
 
-    engine::request _join_request(engine::JOIN);
+    request _join_request(JOIN);
     auto& _join_fields = _join_request.get_fields();
     std::array _id{
         std::byte{0xA2}, std::byte{0xCF}, std::byte{0xAA}, std::byte{0xCF},
@@ -57,40 +59,70 @@ TEST_F(listener_test, it_can_handle_requests) {
     };
     _join_fields.emplace_back(_id);
 
-    auto _payload = engine::serialize_requests({ _join_request });
+    request _ping_request(PING);
+
+    auto _payload = serialize_requests({ _join_request, _ping_request });
 
     const std::uint32_t _payload_size =
         boost::endian::native_to_big(
             static_cast<std::uint32_t>(_payload.size() - 4)
         );
 
-    std::array<std::byte, 4> _header;
+    std::array<std::byte, 4> _header{};
     std::memcpy(_header.data(), &_payload_size, sizeof(_payload_size));
 
     boost::asio::write(_socket, boost::asio::buffer(_header));
     boost::asio::write(_socket, boost::asio::buffer(_payload));
 
-    std::vector<std::byte> _response(17);
+    std::vector<std::byte> _response(18 * 2);
     boost::asio::read(_socket, boost::asio::buffer(_response));
 
-    boost::uuids::uuid _received_id;
-    std::memcpy(_received_id.data, _response.data(), 16);
-    const uint8_t status = static_cast<uint8_t>(_response[16]);
+    boost::uuids::uuid _received_join_request_id;
+    std::memcpy(_received_join_request_id.data, _response.data(), 16);
 
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[0] }, std::byte{ _received_id.data[0] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[1] }, std::byte{ _received_id.data[1] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[2] }, std::byte{ _received_id.data[2] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[3] }, std::byte{ _received_id.data[3] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[4] }, std::byte{ _received_id.data[4] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[5] }, std::byte{ _received_id.data[5] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[6] }, std::byte{ _received_id.data[6] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[7] }, std::byte{ _received_id.data[7] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[8] }, std::byte{ _received_id.data[8] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[9] }, std::byte{ _received_id.data[9] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[10] }, std::byte{ _received_id.data[10] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[11] }, std::byte{ _received_id.data[11] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[12] }, std::byte{ _received_id.data[12] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[13] }, std::byte{ _received_id.data[13] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[14] }, std::byte{ _received_id.data[14] });
-    ASSERT_EQ(std::byte{ _join_request.get_id().data[15] }, std::byte{ _received_id.data[15] });
+    boost::uuids::uuid _received_ping_request_id;
+    std::memcpy(_received_ping_request_id.data, _response.data() + 18, 16);
+
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[0] }, std::byte{ _received_join_request_id.data[0] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[1] }, std::byte{ _received_join_request_id.data[1] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[2] }, std::byte{ _received_join_request_id.data[2] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[3] }, std::byte{ _received_join_request_id.data[3] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[4] }, std::byte{ _received_join_request_id.data[4] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[5] }, std::byte{ _received_join_request_id.data[5] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[6] }, std::byte{ _received_join_request_id.data[6] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[7] }, std::byte{ _received_join_request_id.data[7] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[8] }, std::byte{ _received_join_request_id.data[8] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[9] }, std::byte{ _received_join_request_id.data[9] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[10] }, std::byte{ _received_join_request_id.data[10] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[11] }, std::byte{ _received_join_request_id.data[11] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[12] }, std::byte{ _received_join_request_id.data[12] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[13] }, std::byte{ _received_join_request_id.data[13] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[14] }, std::byte{ _received_join_request_id.data[14] });
+    ASSERT_EQ(std::byte{ _join_request.get_id().data[15] }, std::byte{ _received_join_request_id.data[15] });
+    const auto _join_status = static_cast<uint8_t>(_response[16]);
+    const auto _join_fields_length = static_cast<uint8_t>(_response[17]);
+    ASSERT_EQ(_join_status, 200);
+    ASSERT_EQ(_join_fields_length, 0);
+
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[0] }, std::byte{ _received_ping_request_id.data[0] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[1] }, std::byte{ _received_ping_request_id.data[1] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[2] }, std::byte{ _received_ping_request_id.data[2] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[3] }, std::byte{ _received_ping_request_id.data[3] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[4] }, std::byte{ _received_ping_request_id.data[4] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[5] }, std::byte{ _received_ping_request_id.data[5] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[6] }, std::byte{ _received_ping_request_id.data[6] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[7] }, std::byte{ _received_ping_request_id.data[7] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[8] }, std::byte{ _received_ping_request_id.data[8] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[9] }, std::byte{ _received_ping_request_id.data[9] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[10] }, std::byte{ _received_ping_request_id.data[10] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[11] }, std::byte{ _received_ping_request_id.data[11] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[12] }, std::byte{ _received_ping_request_id.data[12] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[13] }, std::byte{ _received_ping_request_id.data[13] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[14] }, std::byte{ _received_ping_request_id.data[14] });
+    ASSERT_EQ(std::byte{ _ping_request.get_id().data[15] }, std::byte{ _received_ping_request_id.data[15] });
+
+    const auto _ping_status = static_cast<uint8_t>(_response[34]);
+    const auto _ping_fields_length = static_cast<uint8_t>(_response[35]);
+    ASSERT_EQ(_ping_status, 200);
+    ASSERT_EQ(_ping_fields_length, 0);
 }

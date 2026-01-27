@@ -16,7 +16,7 @@
 #include <engine/request.hpp>
 
 #include <cstdint>
-#include <boost/endian/conversion.hpp>
+#include <boost/endian.hpp>
 #include <boost/uuid/uuid.hpp>
 
 namespace engine {
@@ -46,7 +46,7 @@ namespace engine {
         );
 
         const auto _action = static_cast<action>(std::to_integer<std::uint8_t>(data[_offset++]));
-        request _req(_action, _id);
+        request _request(_action, _id);
 
         const auto _fields_length = std::to_integer<std::uint8_t>(data[_offset++]);
 
@@ -55,14 +55,13 @@ namespace engine {
             std::memcpy(&_length_be, data.data() + _offset, sizeof(_length_be));
             _offset += sizeof(_length_be);
 
-            const std::uint16_t _length =
-                boost::endian::big_to_native(_length_be);
+            const std::uint16_t _length = boost::endian::big_to_native(_length_be);
 
-            _req.fields_.push_back(data.subspan(_offset, _length));
+            _request.fields_.push_back(data.subspan(_offset, _length));
             _offset += _length;
         }
 
-        return _req;
+        return _request;
     }
 
     std::vector<std::byte> request::to_binary() const {
@@ -84,15 +83,10 @@ namespace engine {
         _result.push_back(std::byte{ static_cast<std::uint8_t>(fields_.size()) });
 
         for (const auto& _field : fields_) {
+            boost::endian::big_uint16_t _length = static_cast<std::uint16_t>(_field.size());
+            const auto* _length_pointer = reinterpret_cast<const std::byte*>(&_length);
 
-            const std::uint16_t _length =
-                boost::endian::native_to_big(
-                    static_cast<std::uint16_t>(_field.size())
-                );
-
-            const auto* _p = reinterpret_cast<const std::byte*>(&_length);
-            _result.insert(_result.end(), _p, _p + sizeof(_length));
-
+            _result.insert(_result.end(), _length_pointer, _length_pointer + sizeof(_length));
             _result.insert(_result.end(), _field.begin(), _field.end());
         }
 

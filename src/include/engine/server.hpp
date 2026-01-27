@@ -76,6 +76,12 @@ namespace engine {
          * Stop
          */
         void stop();
+
+    private:
+        /**
+         * Register Actions
+         */
+        void register_actions() const;
     };
 }
 
